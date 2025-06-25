@@ -1,0 +1,22 @@
+# Use the Bitnami Spark 3.5.0 image as the base
+FROM bitnami/spark:3.5.5
+
+# Switch to root to install necessary packages
+USER root
+
+# Install Python development headers and pip, then Jupyter Lab
+# We use a multi-line RUN command to reduce the number of layers
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    python3-dev \
+    python3-pip && \
+    pip install --no-cache-dir jupyterlab notebook pandas && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create a directory for Jupyter notebooks
+
+WORKDIR /opt/bitnami/spark/
+
+# Expose the default Jupyter port
+EXPOSE 8888

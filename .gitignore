@@ -1,0 +1,9 @@
+logs/
+scripts/
+venv/
+.env
+key.json
+models.ipynb
+test.ipynb
+transform.ipynb
+plugins/

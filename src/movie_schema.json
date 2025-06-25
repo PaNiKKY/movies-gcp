@@ -1,0 +1,198 @@
+[
+  {
+    "name": "movie_id",
+    "mode": "NULLABLE",
+    "type": "INTEGER",
+    "description": "",
+    "fields": []
+  },
+  {
+    "name": "imdb_id",
+    "mode": "NULLABLE",
+    "type": "STRING",
+    "description": "",
+    "fields": []
+  },
+  {
+    "name": "original_title",
+    "mode": "NULLABLE",
+    "type": "STRING",
+    "description": "",
+    "fields": []
+  },
+  {
+    "name": "title",
+    "mode": "NULLABLE",
+    "type": "STRING",
+    "description": "",
+    "fields": []
+  },
+  {
+    "name": "genres",
+    "mode": "REPEATED",
+    "type": "STRING",
+    "description": "",
+    "fields": []
+  },
+  {
+    "name": "origin_country",
+    "mode": "REPEATED",
+    "type": "STRING",
+    "description": "",
+    "fields": []
+  },
+  {
+    "name": "popularity",
+    "mode": "REPEATED",
+    "type": "RECORD",
+    "description": "",
+    "fields": [
+      {
+        "name": "value",
+        "mode": "NULLABLE",
+        "type": "FLOAT",
+        "description": "",
+        "fields": []
+      }
+    ]
+  },
+  {
+    "name": "production_companies",
+    "mode": "REPEATED",
+    "type": "INTEGER",
+    "description": "",
+    "fields": []
+  },
+  {
+    "name": "release_date",
+    "mode": "NULLABLE",
+    "type": "DATE",
+    "description": "",
+    "fields": []
+  },
+  {
+    "name": "runtime",
+    "mode": "NULLABLE",
+    "type": "INTEGER",
+    "description": "",
+    "fields": []
+  },
+  {
+    "name": "vote_average",
+    "mode": "REPEATED",
+    "type": "RECORD",
+    "description": "",
+    "fields": [
+      {
+        "name": "value",
+        "mode": "NULLABLE",
+        "type": "FLOAT",
+        "description": "",
+        "fields": []
+      }
+    ]
+  },
+  {
+    "name": "vote_count",
+    "mode": "REPEATED",
+    "type": "RECORD",
+    "description": "",
+    "fields": [
+      {
+        "name": "value",
+        "mode": "NULLABLE",
+        "type": "INTEGER",
+        "description": "",
+        "fields": []
+      }
+    ]
+  },
+  {
+    "name": "casts",
+    "mode": "REPEATED",
+    "type": "RECORD",
+    "description": "",
+    "fields": [
+      {
+        "name": "person_id",
+        "mode": "NULLABLE",
+        "type": "INTEGER",
+        "description": "",
+        "fields": []
+      },
+      {
+        "name": "order",
+        "mode": "NULLABLE",
+        "type": "INTEGER",
+        "description": "",
+        "fields": []
+      }
+    ]
+  },
+  {
+    "name": "crews",
+    "mode": "REPEATED",
+    "type": "RECORD",
+    "description": "",
+    "fields": [
+      {
+        "name": "person_id",
+        "mode": "NULLABLE",
+        "type": "INTEGER",
+        "description": "",
+        "fields": []
+      },
+      {
+        "name": "job",
+        "mode": "NULLABLE",
+        "type": "STRING",
+        "description": "",
+        "fields": []
+      }
+    ]
+  },
+  {
+    "name": "opening_gross",
+    "mode": "NULLABLE",
+    "type": "INTEGER",
+    "description": "",
+    "fields": []
+  },
+  {
+    "name": "movie_budget",
+    "mode": "NULLABLE",
+    "type": "INTEGER",
+    "description": "",
+    "fields": []
+  },
+  {
+    "name": "gross",
+    "mode": "REPEATED",
+    "type": "RECORD",
+    "description": "",
+    "fields": [
+      {
+        "name": "value",
+        "mode": "NULLABLE",
+        "type": "INTEGER",
+        "description": "",
+        "fields": []
+      }
+    ]
+  },
+  {
+    "name": "current_date",
+    "mode": "REPEATED",
+    "type": "RECORD",
+    "description": "",
+    "fields": [
+      {
+        "name": "value",
+        "mode": "NULLABLE",
+        "type": "DATE",
+        "description": "",
+        "fields": []
+      }
+    ]
+  }
+]
