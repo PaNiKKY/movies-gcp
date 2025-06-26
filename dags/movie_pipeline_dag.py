@@ -18,8 +18,6 @@ import sys
 import os
 load_dotenv()
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from etl.movies_extraction import get_movie_ids, run_box_office_data, run_movie_credits, run_movie_details
 
 
@@ -31,16 +29,16 @@ bucket_name = f"{project_id}-{bucket_suffix}"
 bq_temp = f"{project_id}-bq-temp"
 cluster_name = f"{project_id}-cluster"
 
-with open("/opt/airflow/src/upsert.sql", "r") as u:
+with open("/home/airflow/gcs/dags/upsert.sql", "r") as u:
     query_string = u.read()
 
 @dag(
-    schedule=None,
+    schedule_interval="@daily",
     start_date=datetime(2023, 10, 1),
     catchup=False,
     tags=['gcp', 'etl']
 )
-def test_dag():
+def movie_pipeline_dag():
 
     date = "{{ ds }}"
     # date = "2025-06-21"
@@ -63,7 +61,7 @@ def test_dag():
     CLEANING_JOB = {
         "reference": {"project_id": project_id},
         "placement": {"cluster_name": cluster_name},
-        "pyspark_job": {"main_python_file_uri": "gs://sodium-keel-461511-u2-movies-script/clean_typing.py",
+        "pyspark_job": {"main_python_file_uri": "gs://sodium-keel-461511-u2-movies-scripts/dags/etl/clean_typing.py",
                         "args": [
                                     "--date_input", date,
                                     "--bucket_name", bucket_name
@@ -73,7 +71,7 @@ def test_dag():
     MODEL_JOB = {
         "reference": {"project_id": project_id},
         "placement": {"cluster_name": cluster_name},
-        "pyspark_job": {"main_python_file_uri": "gs://sodium-keel-461511-u2-movies-script/models.py",
+        "pyspark_job": {"main_python_file_uri": "gs://sodium-keel-461511-u2-movies-scripts/dags/etl/models.py",
                         "args": [
                                     "--date_input", date,
                                     "--bucket_name", bucket_name,
@@ -85,10 +83,9 @@ def test_dag():
 
     _create_bucket_task = GCSCreateBucketOperator(
         task_id='create_bucket_if_not_exists',
-        gcp_conn_id='gcp_conn',
         bucket_name=bucket_name,
         project_id=project_id,
-        location=region.split("-")[0].upper(),
+        location=region.split("-")[0].upper()
         )
 
     @task_group(group_id='extraction')
@@ -104,7 +101,7 @@ def test_dag():
             movie_details= run_movie_details(movie_id)
             imdb_ids = [movie['imdb_id'] for movie in movie_details if movie['imdb_id']]
             year, month, day = date.split("-")
-            gcs_hook = GCSHook(gcp_conn_id='gcp_conn')
+            gcs_hook = GCSHook()
             gcs_hook.upload(
                 bucket_name=bucket_name,
                 object_name=f'raw/{year}/{month}/{day}/movie_details.json',
@@ -119,7 +116,7 @@ def test_dag():
             box_office_data = run_box_office_data(movie_id)
 
             year, month, day = date.split("-")
-            gcs_hook = GCSHook(gcp_conn_id='gcp_conn')
+            gcs_hook = GCSHook()
             gcs_hook.upload(
                 bucket_name=bucket_name,
                 object_name=f'raw/{year}/{month}/{day}/box_office.json',
@@ -132,7 +129,7 @@ def test_dag():
         def extract_movie_credits_task(movie_id,date):
             movie_credits = run_movie_credits(movie_id)
             year, month, day = date.split("-")
-            gcs_hook = GCSHook(gcp_conn_id='gcp_conn')
+            gcs_hook = GCSHook()
             gcs_hook.upload(
                 bucket_name=bucket_name,
                 object_name=f'raw/{year}/{month}/{day}/movie_credits.json',
@@ -151,24 +148,21 @@ def test_dag():
         project_id=project_id,
         cluster_config=cluster_generator_config,
         region=region,
-        cluster_name=cluster_name,
-        gcp_conn_id = 'gcp_conn'
+        cluster_name=cluster_name
     )
 
     transform_job_task = DataprocSubmitJobOperator(
         task_id="transform_job_task", 
         job=CLEANING_JOB, 
         region=region, 
-        project_id=project_id,
-        gcp_conn_id = "gcp_conn"
+        project_id=project_id
     )
 
     modeling_job_task = DataprocSubmitJobOperator(
         task_id="modeling_job_task", 
         job=MODEL_JOB, 
         region=region, 
-        project_id=project_id,
-        gcp_conn_id = "gcp_conn"
+        project_id=project_id
     )
 
     delete_cluster = DataprocDeleteClusterOperator(
@@ -176,7 +170,6 @@ def test_dag():
         project_id=project_id,
         cluster_name=cluster_name,
         region=region,
-        gcp_conn_id = 'gcp_conn',
         trigger_rule="none_failed_min_one_success"
     )
 
@@ -186,12 +179,12 @@ def test_dag():
                 "query": {
                     "query":query_string.format(
                         project_id=project_id,
-                        bigqury_dataset="movies_dataset"
+                        bigqury_dataset="movies_dataset",
+                        date=date
                     ),
                     "useLegacySql": False,
                 }
-            },
-            gcp_conn_id='gcp_conn',
+            }
         )
     
     delete_staging_table = BigQueryInsertJobOperator(
@@ -206,12 +199,11 @@ def test_dag():
                         """,
                     "useLegacySql": False,
                 }
-            },
-            gcp_conn_id='gcp_conn',
+            }
         )
 
     _create_bucket_task >> [extraction_group(date), create_cluster] >> transform_job_task
     transform_job_task >> modeling_job_task >> [delete_cluster, upsert_to_fact_table]
     upsert_to_fact_table >> delete_staging_table
 
-test_dag()
+movie_pipeline_dag()

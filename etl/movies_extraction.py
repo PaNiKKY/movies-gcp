@@ -8,9 +8,6 @@ import sys
 from dotenv import load_dotenv
 import os
 
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 load_dotenv()
 API_KEY = os.getenv("TMDB_API_KEY")
 

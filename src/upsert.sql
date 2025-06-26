@@ -36,7 +36,7 @@ USING (
       ELSE ARRAY_CONCAT(m.gross, sm.gross)
     END AS gross,
     CASE
-      WHEN sm.current_date IS NULL AND m.current_date IS NOT NULL THEN ARRAY_CONCAT(m.current_date, [STRUCT(SAFE_CAST(NULL AS DATE) AS value)])
+      WHEN sm.current_date IS NULL AND m.current_date IS NOT NULL THEN ARRAY_CONCAT(m.current_date, [STRUCT(SAFE_CAST('{date}' AS DATE) AS value)])
       WHEN sm.current_date IS NOT NULL AND m.current_date IS NULL THEN sm.current_date
       ELSE ARRAY_CONCAT(m.current_date, sm.current_date)
     END AS current_date
