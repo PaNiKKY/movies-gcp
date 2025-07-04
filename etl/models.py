@@ -134,27 +134,19 @@ movie_join_df = movie_details_sep \
         coalesce(box_office_df.budget, movie_details_sep.budget).cast(LongType())
     ) \
     .withColumn(
-        "gross",
-        array(struct(coalesce(box_office_df.worldwide_gross, movie_details_sep.revenue).cast(LongType()).alias("value")))
-    ) \
-    .withColumn(
-        "current_date",
-        array(struct(lit(date).cast(DateType()).alias("value")))
-    ) \
+        "metrics",
+        array(
+            struct(
+                col("popularity").cast(FloatType()).alias("popularity"),
+                col("vote_count").cast(IntegerType()).alias("vote_count"),  
+                col("vote_average").cast(FloatType()).alias("vote_average"),
+                coalesce(box_office_df.worldwide_gross, movie_details_sep.revenue).cast(LongType()).alias("gross"),
+                lit(date).cast(DateType()).alias("collect_date")
+              )
+        )
+    )  \
     .drop(crew_movie_id.movie_id, cast_movie_df.movie_id, box_office_df.imdb_id, 
-          "budget", box_office_df.worldwide_gross, movie_details_sep.revenue, "domestic_opening") \
-    .withColumn(
-        "popularity",
-        array(struct(col("popularity").cast(FloatType()).alias("value")))
-    ) \
-    .withColumn(
-            "vote_average",
-            array(struct(col("vote_average").cast(FloatType()).alias("value")))
-    ) \
-    .withColumn(
-            "vote_count",
-            array(struct(col("vote_count").cast(IntegerType()).alias("value")))
-    )
+          "budget", box_office_df.worldwide_gross, movie_details_sep.revenue, "domestic_opening")
 
 # Union credit details
 credit_df = cast_details_df.union(crew_details_df).dropDuplicates(["person_id"])
