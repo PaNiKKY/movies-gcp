@@ -25,6 +25,9 @@ The project uses a robust ETL architecture with various GCP services for efficie
 - **Looker Studio**: A free, web-based data visualization tool connected to BigQuery. It enables intuitive creation of interactive dashboards and reports for sharing real-time insights.
 
 # Data Modeling
+
+![](project_pictures/diagram.png)
+
 The data is modeled using a denormalized approach within a single primary table, optimized for analytical queries in BigQuery. This design leverages BigQuery's nested and repeated field capabilities to store both static attributes and time-series metrics in one record.
 
 - **movies**: The movie table is a denormalized, comprehensive table using BigQuery's REPEATED RECORD types. popularity, vote_average, vote_count, and gross fields store daily cumulative data (value and current_date) directly within each movie record. casts and crews are also REPEATED RECORD fields, linking to the credit dimension via person_id. production_companies links to the company dimension.
