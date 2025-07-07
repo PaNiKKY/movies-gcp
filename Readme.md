@@ -33,3 +33,17 @@ The data is modeled using a denormalized approach within a single primary table,
 
 - **companies**: The company dimension provides production entity details, enabling filtering and aggregation by company attributes. company_id links to the production_companies field in the movie table.
 - **dim_date**: The date dimension table facilitates time-based analysis by providing various time attributes, improving query performance and simplifying reporting. It can be joined with movie.release_date and the current_date fields within movie's nested metrics
+
+## Example Reports
+
+![](project_pictures/example_report.png)
+
+This image displays three different graphs, likely from a dashboard in Looker Studio, providing insights into movie data based on genre.
+
+- **Budget vs. Gross Revenue**: A bar chart comparing investment (budget) and earnings (gross) by genre, highlighting that genres like "Adventure" and "Animation" typically have high budgets and strong commercial returns.
+
+- **Popularity by Genre**: A bar chart ranking genres by average popularity, showing "Animation" and "Science Fiction" as most popular.
+
+- **Popularity vs. Gross Revenue**: A bubble chart illustrating the correlation between a genre's popularity and its gross revenue, generally indicating that higher popularity aligns with greater commercial success.
+
+Collectively, these graphs offer insights into genre-specific financial performance and audience engagement in the film industry.
